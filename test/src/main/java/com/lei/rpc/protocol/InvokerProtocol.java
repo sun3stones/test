@@ -1,6 +1,5 @@
 package com.lei.rpc.protocol;
 
-import com.alibaba.fastjson.JSONObject;
 
 public class InvokerProtocol {
 
