@@ -1,8 +1,5 @@
 package com.lei.rpc.consumer;
 
-import com.lei.rpc.protocol.InvokerProtocol;
-import com.lei.rpc.protocol.Transfer;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
@@ -11,16 +8,23 @@ import java.net.InetSocketAddress;
 
 public class ConsumerHandler extends ChannelInboundHandlerAdapter {
 
+    private Object result;
+
+    public Object getResult() {
+        return result;
+    }
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println(123);
+        InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
+        System.out.println("请求服务端：" + address.getPort());
     }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        String[] ad = ((String) msg).split(":");
-
-        ctx.writeAndFlush(msg).addListener(ChannelFutureListener.CLOSE);
+        System.out.println("返回结果："+msg);
+        result = msg;
+        ctx.close();
     }
 
     @Override

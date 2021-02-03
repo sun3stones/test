@@ -2,6 +2,7 @@ package com.lei.rpc.register;
 
 import com.lei.rpc.protocol.InvokerProtocol;
 import com.lei.rpc.protocol.Transfer;
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.springframework.util.CollectionUtils;
@@ -22,7 +23,6 @@ public class RegisterHandler extends ChannelInboundHandlerAdapter {
         InetSocketAddress localAddress = (InetSocketAddress) ctx.channel().localAddress();
         String msg = "服务注册成功" + address.getAddress().getHostAddress() + ":" + address.getPort();
         System.out.println(msg);
-        ctx.writeAndFlush(msg);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class RegisterHandler extends ChannelInboundHandlerAdapter {
         Transfer<InvokerProtocol> transfer = new Transfer<>();
         InvokerProtocol protocol = transfer.deserialize(msg.toString(),InvokerProtocol.class);
         if (protocol.isConsumer()){
-            String consumerAddress = address.getAddress().getHostAddress() + ":" + address.getPort();
+            String consumerAddress = address.getAddress().getHostAddress() + ":" + protocol.getPort();
             LinkedHashSet<String> providers = interfaceMap.get(protocol.getClassName());
             if (CollectionUtils.isEmpty(providers)){
                 System.out.println("provider [" + protocol.getClassName() + "] is not found");
@@ -44,16 +44,18 @@ public class RegisterHandler extends ChannelInboundHandlerAdapter {
             }
             while (iterator.hasNext()){
                 String provider = iterator.next();
-                ctx.writeAndFlush(provider);
+                ctx.writeAndFlush(provider).addListener(ChannelFutureListener.CLOSE);
+                ctx.close();
                 System.out.println("消费者【" + consumerAddress + "】获取服务【" + protocol.getClassName() + "】服务地址【" + provider +"】");
                 return;
             }
             iterator = providers.iterator();
             String provider = iterator.next();
             ctx.writeAndFlush(provider);
+            ctx.close();
             System.out.println("消费者【" + consumerAddress + "】获取服务【" + protocol.getClassName() + "】服务地址【" + provider +"】");
         } else {
-            String providerAddress = address.getAddress().getHostAddress() + ":" + address.getPort();
+            String providerAddress = address.getAddress().getHostAddress() + ":" + protocol.getPort();
             LinkedHashSet<String> providers = interfaceMap.get(protocol.getClassName());
             if (CollectionUtils.isEmpty(providers)){
                 providers = new LinkedHashSet<>(Collections.singleton(providerAddress));

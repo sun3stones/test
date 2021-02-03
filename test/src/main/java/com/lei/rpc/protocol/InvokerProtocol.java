@@ -7,14 +7,16 @@ public class InvokerProtocol {
     private String className;
     private String methodName;
     private Object[] params;
+    private Integer port;
 
     /**
      * 生产者
      * @param className
      */
-    public InvokerProtocol(String className) {
+    public InvokerProtocol(String className,Integer port) {
         this.isConsumer = false;
         this.className = className;
+        this.port = port;
     }
 
     /**
@@ -63,5 +65,13 @@ public class InvokerProtocol {
 
     public void setParams(Object[] params) {
         this.params = params;
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
     }
 }
