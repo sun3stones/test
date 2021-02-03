@@ -2,7 +2,6 @@ package com.lei.rpc.provider;
 
 import com.lei.rpc.protocol.InvokerProtocol;
 import com.lei.rpc.protocol.Transfer;
-import com.lei.rpc.register.RegisterHandler;
 import com.lei.rpc.service.IRpcService;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
@@ -19,7 +18,7 @@ import io.netty.handler.codec.string.StringEncoder;
 
 public class Provider {
 
-    public static void register(Integer registerPort) throws InterruptedException {
+    public static void register(Integer providerPort) throws InterruptedException {
         NioEventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             Bootstrap b = new Bootstrap();
@@ -33,14 +32,14 @@ public class Provider {
                 }
             });
             // Start the client.
-            ChannelFuture f = b.connect("127.0.0.1", registerPort).sync();
+            ChannelFuture f = b.connect("127.0.0.1", 2181).sync();
             Transfer<InvokerProtocol> transfer = new Transfer<>();
-            f.channel().writeAndFlush(transfer.serialize(new InvokerProtocol(IRpcService.class.getName())));
-            provider(8000);
+            f.channel().writeAndFlush(transfer.serialize(new InvokerProtocol(IRpcService.class.getName(),providerPort)));
+            provider(providerPort);
             // Wait until the connection is closed.
             f.channel().closeFuture().sync();
         } catch (Exception e){
-            System.out.println("找不到注册中心【"+registerPort+"】");
+            System.out.println("找不到注册中心【2181】");
             workerGroup.shutdownGracefully();
         }
 
@@ -75,7 +74,7 @@ public class Provider {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        register(2181);
+        register(8002);
 
     }
 }
