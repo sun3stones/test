@@ -18,7 +18,7 @@ public class EightQueen {
     private static void play(int m){
         for (int i = 0; i < arrays.length; i++) {
             if (display(m,i)){
-                if (i == arrays.length - 1){
+                if (m == arrays.length - 1){
                     System.out.println("第" + (++count) + "种");
                     print();
                 } else {
