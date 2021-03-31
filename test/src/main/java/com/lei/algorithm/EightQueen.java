@@ -9,28 +9,24 @@ public class EightQueen {
 
 
     public static void main(String[] args) {
-        row = 5;
+        row = 4;
         arrays = init(row);
-        play(0,0);
+        play(0);
 
     }
 
-    private static boolean play(int m, int n){
-        for (int i = n; i < arrays.length; i++) {
+    private static void play(int m){
+        for (int i = 0; i < arrays.length; i++) {
             if (display(m,i)){
-                if (m == arrays.length -1){
+                if (i == arrays.length - 1){
                     System.out.println("第" + (++count) + "种");
                     print();
-                    arrays[m][i] = 0;
-                    return true;
+                } else {
+                    play(m + 1);
                 }
-                if (!play(m+1,0)){//如果下一行放置不成功，重新放置n，从n+i开始
-                    arrays[m][i] = 0;
-                    play(m,i + 1);
-                }
+                arrays[m][i] = 0;
             }
         }
-        return false;
     }
 
 
