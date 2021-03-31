@@ -1,5 +1,10 @@
 package com.lei.concurrent;
 
+import com.google.common.util.concurrent.*;
+import io.netty.channel.DefaultChannelPromise;
+import io.netty.util.concurrent.CompleteFuture;
+import io.netty.util.concurrent.Future;
+
 import java.util.concurrent.*;
 
 public class FutureDemo {
@@ -10,7 +15,7 @@ public class FutureDemo {
 
         @Override
         public Object call() throws Exception {
-            Thread.sleep(500);
+            Thread.sleep(100);
             return i++;
         }
     }
@@ -24,7 +29,33 @@ public class FutureDemo {
         futureTask.get(200, TimeUnit.MILLISECONDS);
         time -= System.currentTimeMillis();
         System.out.println(time + "ms");
+        guavaFuture();
 
+    }
+
+    //guava的future
+    public static void guavaFuture(){
+        ListenableFutureTask futureTask = ListenableFutureTask.create(new MyCallable());
+        futureTask.addListener(() -> {
+            System.out.println("listen");
+        }, MoreExecutors.sameThreadExecutor());
+        Futures.addCallback(futureTask, new FutureCallback<Object>() {
+            @Override
+            public void onSuccess(Object o) {
+                System.out.println("success:" + o);
+            }
+
+            @Override
+            public void onFailure(Throwable throwable) {
+                throwable.printStackTrace();
+            }
+        });
+        Thread thread = new Thread(futureTask);
+        thread.start();
+    }
+
+    //netty的future
+    public static void nettyFuture(){
     }
 
 }
