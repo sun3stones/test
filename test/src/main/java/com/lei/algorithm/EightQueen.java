@@ -1,5 +1,8 @@
 package com.lei.algorithm;
 
+/**
+ * 八皇后
+ */
 public class EightQueen {
 
     private static int row;
